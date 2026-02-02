@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ubicación Bodega</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    input {
+      font-size: 22px;
+      padding: 12px;
+      width: 90%;
+      max-width: 320px;
+    }
+
+    #resultado {
+      margin-top: 30px;
+      font-size: 48px;
+      font-weight: bold;
+    }
+
+    .error {
+      color: red;
+      font-size: 22px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Buscar ubicación</h2>
+
+  <input
+    type="number"
+    id="material"
+    placeholder="Código de material"
+    inputmode="numeric"
+    autofocus
+  >
+
+  <div id="resultado"></div>
+
+  <script>
+    let mapa = {};
+
+    fetch("alimentos.csv")
+      .then(res => res.text())
+      .then(texto => {
+        const lineas = texto.split("\n").slice(1);
+
+        lineas.forEach(linea => {
+          const [ubicacion, material] = linea.split(",");
+          if (material && ubicacion) {
+            mapa[material.trim()] = ubicacion.trim();
+          }
+        });
+      });
+
+    document.getElementById("material").addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        buscar();
+      }
+    });
+
+    function buscar() {
+      const input = document.getElementById("material");
+      const material = input.value.trim();
+      const resultado = document.getElementById("resultado");
+
+      if (!material) return;
+
+      if (mapa[material]) {
+        resultado.className = "";
+        resultado.textContent = " " + mapa[material];
+      } else {
+        resultado.className = "error";
+        resultado.textContent = "Material no encontrado";
+      }
+
+      input.value = "";
+      input.focus();
+    }
+  </script>
+
+</body>
+</html>
