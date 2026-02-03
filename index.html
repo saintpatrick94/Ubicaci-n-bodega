@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Ubicaci髇 Bodega</title>
+  <title>Ubicaci贸n Bodega</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
@@ -10,10 +10,6 @@
       font-family: Arial, sans-serif;
       text-align: center;
       padding: 20px;
-    }
-
-    h2 {
-      margin-bottom: 15px;
     }
 
     input {
@@ -25,7 +21,7 @@
 
     #resultado {
       margin-top: 30px;
-      font-size: 48px;
+      font-size: 28px;
       font-weight: bold;
     }
 
@@ -37,12 +33,12 @@
 </head>
 <body>
 
-  <h2>Buscar ubicaci髇</h2>
+  <h2>Buscar ubicaci贸n</h2>
 
   <input
     type="number"
     id="material"
-    placeholder="C骴igo de material"
+    placeholder="C贸digo de material"
     inputmode="numeric"
     autofocus
   >
@@ -79,8 +75,13 @@
       if (!material) return;
 
       if (mapa[material]) {
+
         resultado.className = "";
-        resultado.textContent = " " + mapa[material];
+
+        resultado.innerHTML =
+          "Material: " + material + "<br><br>" +
+          "Ubicaci贸n: 馃摝 " + mapa[material];
+
       } else {
         resultado.className = "error";
         resultado.textContent = "Material no encontrado";
