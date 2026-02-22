@@ -1,97 +1,52 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Ubicación Bodega</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-
-    input {
-      font-size: 22px;
-      padding: 12px;
-      width: 90%;
-      max-width: 320px;
-    }
-
-    #resultado {
-      margin-top: 30px;
-      font-size: 28px;
-      font-weight: bold;
-    }
-
-    .error {
-      color: red;
-      font-size: 22px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Buscador de Materiales</title>
 </head>
 <body>
+    <h2>Buscador de Material</h2>
 
-  <h2>Buscar ubicación</h2>
+    <input type="text" id="codigo" placeholder="Ingrese material">
+    <button onclick="buscar()">Buscar</button>
 
-  <input
-    type="number"
-    id="material"
-    placeholder="Código de material"
-    inputmode="numeric"
-    autofocus
-  >
+    <p id="resultado"></p>
 
-  <div id="resultado"></div>
+    <script>
+        let datos = [];
 
-  <script>
-    let mapa = {};
-
-    fetch("alimentos.csv")
-      .then(res => res.text())
-      .then(texto => {
-        const lineas = texto.split("\n").slice(1);
-
-        lineas.forEach(linea => {
-          const [ubicacion, material] = linea.split(",");
-          if (material && ubicacion) {
-            mapa[material.trim()] = ubicacion.trim();
-          }
+        // Cargar el CSV
+        fetch("datos.csv")
+        .then(response => response.text())
+        .then(texto => {
+            let filas = texto.split("\n");
+            for (let i = 1; i < filas.length; i++) {
+                let columnas = filas[i].split(",");
+                if (columnas.length >= 3) {
+                    datos.push({
+                        material: columnas[0].trim(),
+                        ubicacion: columnas[1].trim(),
+                        texto: columnas[2].trim()
+                    });
+                }
+            }
         });
-      });
 
-    document.getElementById("material").addEventListener("keydown", e => {
-      if (e.key === "Enter") {
-        buscar();
-      }
-    });
+        function buscar() {
+            let codigo = document.getElementById("codigo").value.trim();
+            let resultado = document.getElementById("resultado");
 
-    function buscar() {
-      const input = document.getElementById("material");
-      const material = input.value.trim();
-      const resultado = document.getElementById("resultado");
+            let encontrado = datos.find(item => item.material === codigo);
 
-      if (!material) return;
-
-      if (mapa[material]) {
-
-        resultado.className = "";
-
-        resultado.innerHTML =
-          "Material: " + material + "<br><br>" +
-          "Ubicación: " + mapa[material];
-
-      } else {
-        resultado.className = "error";
-        resultado.textContent = "Material no encontrado";
-      }
-
-      input.value = "";
-      input.focus();
-    }
-  </script>
-
+            if (encontrado) {
+                resultado.innerHTML =
+                    "<b>Material:</b> " + encontrado.material + "<br>" +
+                    "<b>Ubicación:</b> " + encontrado.ubicacion + "<br>" +
+                    "<b>Descripción:</b> " + encontrado.texto;
+            } else {
+                resultado.innerHTML = "Material no encontrado";
+            }
+        }
+    </script>
 </body>
 </html>
-
