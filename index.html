@@ -5,6 +5,7 @@
     <title>Buscador de Materiales</title>
 </head>
 <body>
+
     <img src="isamsa-logo.png" alt="LogoISAM">
     <h2>Buscador de Material</h2>
 
@@ -13,10 +14,16 @@
 
     <p id="resultado"></p>
 
+    <h3>Lista de Picking</h3>
+    <div id="lista"></div>
+
+    <button onclick="optimizar()">Optimizar recorrido</button>
+
     <script>
         let datos = [];
+        let picking = [];
 
-        // Cargar el CSV
+        // Cargar CSV
         fetch("datos.csv")
         .then(response => response.text())
         .then(texto => {
@@ -27,7 +34,7 @@
                     datos.push({
                         material: columnas[0].trim(),
                         ubicacion: columnas[1].trim(),
-                        texto: columnas[2].trim()
+                        texto: columnas.slice(2).join(",").trim()
                     });
                 }
             }
@@ -43,11 +50,42 @@
                 resultado.innerHTML =
                     "<b>Material:</b> " + encontrado.material + "<br>" +
                     "<b>Ubicación:</b> " + encontrado.ubicacion + "<br>" +
-                    "<b>Descripción:</b> " + encontrado.texto;
+                    "<b>Descripción:</b> " + encontrado.texto + "<br><br>" +
+                    "<button onclick='agregarAPicking(" + JSON.stringify(encontrado) + ")'>Agregar a picking</button>";
             } else {
                 resultado.innerHTML = "Material no encontrado";
             }
         }
+
+        function agregarAPicking(item) {
+            picking.push(item);
+            mostrarLista();
+        }
+
+        function mostrarLista() {
+            let lista = document.getElementById("lista");
+            lista.innerHTML = "";
+
+            picking.forEach(p => {
+                lista.innerHTML +=
+                    "<div>" + p.material + " - " + p.ubicacion + "</div>";
+            });
+        }
+
+        // Extrae número de pasillo (ej: K21-38-A → 21)
+        function obtenerPasillo(ubicacion) {
+            let match = ubicacion.match(/\d+/);
+            return match ? parseInt(match[0]) : 999;
+        }
+
+        function optimizar() {
+            picking.sort((a, b) => {
+                return obtenerPasillo(a.ubicacion) - obtenerPasillo(b.ubicacion);
+            });
+
+            mostrarLista();
+        }
     </script>
+
 </body>
 </html>
