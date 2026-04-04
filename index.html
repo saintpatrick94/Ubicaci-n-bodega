@@ -40,22 +40,52 @@
             }
         });
 
-        function buscar() {
-            let codigo = document.getElementById("codigo").value.trim();
-            let resultado = document.getElementById("resultado");
+    function buscar() {
+    let codigo = document.getElementById("codigo").value.trim();
+    let resultado = document.getElementById("resultado");
 
-            let encontrado = datos.find(item => item.material === codigo);
+    if (!codigo) return;
 
-            if (encontrado) {
-                resultado.innerHTML =
-                    "<b>Material:</b> " + encontrado.material + "<br>" +
-                    "<b>Ubicación:</b> " + encontrado.ubicacion + "<br>" +
-                    "<b>Descripción:</b> " + encontrado.texto + "<br><br>" +
-                    "<button onclick='agregarAPicking(" + JSON.stringify(encontrado) + ")'>Agregar a picking</button>";
-            } else {
-                resultado.innerHTML = "Material no encontrado";
-            }
-        }
+    let encontrados = [];
+
+    // 1. Buscar coincidencia exacta
+    let exacto = datos.find(item => item.material === codigo);
+
+    if (exacto) {
+        encontrados = [exacto];
+    } else {
+        // 2. Buscar por últimos dígitos
+        encontrados = datos.filter(item =>
+            item.material.endsWith(codigo)
+        );
+    }
+
+    // 3. Mostrar resultados
+    if (encontrados.length === 1) {
+
+        let item = encontrados[0];
+
+        resultado.innerHTML =
+            "<b>Material:</b> " + item.material + "<br>" +
+            "<b>Ubicación:</b> " + item.ubicacion + "<br>" +
+            "<b>Descripción:</b> " + item.texto + "<br><br>" +
+            "<button onclick='agregarAPicking(" + JSON.stringify(item) + ")'>Agregar a picking</button>";
+
+    } else if (encontrados.length > 1) {
+
+        // Si hay varios resultados
+        resultado.innerHTML = "<b>Se encontraron múltiples materiales:</b><br><br>";
+
+        encontrados.forEach(item => {
+            resultado.innerHTML +=
+                item.material + " - " + item.ubicacion +
+                " <button onclick='agregarAPicking(" + JSON.stringify(item) + ")'>Agregar</button><br>";
+        });
+
+    } else {
+        resultado.innerHTML = "Material no encontrado";
+    }
+}
 
         function agregarAPicking(item) {
             picking.push(item);
